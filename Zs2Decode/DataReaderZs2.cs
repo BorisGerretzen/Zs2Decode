@@ -1,6 +1,6 @@
 ﻿using System.IO.Compression;
 
-namespace Zs2Decode; 
+namespace Zs2Decode;
 
 public class DataReaderZs2 {
     private readonly string FileName;
@@ -17,10 +17,10 @@ public class DataReaderZs2 {
         return output;
     }
 
-    public void ReadData() {
+    public Chunk ReadData() {
         var bytes = GetStream().ToArray();
         var fac = new ChunkFactory(bytes.Skip(4).ToArray());
         var output = fac.GenerateChunks();
-        output.ForEach(chunk => Console.WriteLine(chunk.Name));
+        return output;
     }
 }

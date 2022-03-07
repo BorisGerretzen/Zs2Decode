@@ -1,28 +1,39 @@
 ﻿using System.Text;
 
-namespace Zs2Decode; 
+namespace Zs2Decode;
 
 public class ChunkFactory {
     private readonly Queue<byte> data;
-    private readonly int initialCount;
 
     public ChunkFactory(byte[] bytes) {
         data = new Queue<byte>(bytes);
-        initialCount = data.Count;
     }
 
-    private int numDequeued => initialCount - data.Count;
-
-    public List<Chunk> GenerateChunks() {
-        var chunks = new List<Chunk>();
+    public Chunk GenerateChunks() {
+        // Get root chunk
+        var rootChunk = GetSingleFrombytes();
+        var currentChunk = rootChunk;
         var i = 0;
-        while (data.Count > 5) {
-            Console.WriteLine(i);
-            chunks.Add(GetSingleFrombytes());
+        while (data.Count > 0) {
+            //Console.WriteLine(i);
+
+            // If next is close
+            byte peeked;
+            while (data.TryPeek(out peeked) && peeked == 0xFF) {
+                currentChunk = currentChunk.Parent;
+                data.Dequeue();
+            }
+
+            if (data.TryPeek(out peeked)) {
+                var newChunk = GetSingleFrombytes();
+                currentChunk.AddChild(newChunk);
+                if (newChunk.Type == 0xDD) currentChunk = newChunk;
+            }
+
             i++;
         }
 
-        return chunks;
+        return rootChunk;
     }
 
     /// <summary>
@@ -225,7 +236,7 @@ public class ChunkFactory {
                 break;
         }
 
-        return new Chunk(name, type.ToString(), val);
+        return new Chunk(name, type, val);
     }
 
     #region Bytes to datatypes

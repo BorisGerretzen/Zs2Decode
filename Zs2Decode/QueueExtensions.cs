@@ -1,4 +1,4 @@
-﻿namespace Zs2Decode; 
+﻿namespace Zs2Decode;
 
 public static class QueueExtensions {
     public static IEnumerable<T> DequeueChunk<T>(this Queue<T> queue, int chunkSize) {
