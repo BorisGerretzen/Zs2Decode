@@ -1,4 +1,4 @@
 ﻿using Zs2Decode;
 
-var reader = new DataReaderZs2("./demo.zs2");
+var reader = new DataReaderZs2("./test.zs2");
 reader.ReadData();
