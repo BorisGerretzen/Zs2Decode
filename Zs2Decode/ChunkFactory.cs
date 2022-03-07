@@ -93,7 +93,7 @@ namespace Zs2Decode {
 
             // If identification bytes are 0x1100, it is a special list
             // https://zs2decode.readthedocs.io/en/latest/special_chunks.html
-            
+
             if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 })) {
                 builder.Append(BitConverter.ToString(data.DequeueChunk(length).ToArray()));
                 /*
@@ -156,36 +156,31 @@ namespace Zs2Decode {
                     throw new NotImplementedException();
                 }
                 */
-            } else if (identificationBytes.SequenceEqual(new byte[] { 0x04, 0x00 })) {
+            }
+            else if (identificationBytes.SequenceEqual(new byte[] { 0x04, 0x00 })) {
                 for (int i = 0; i < length; i++) {
                     AppendListStringBuilder(builder, GetSingleFP());
                 }
             }
-            else if (identificationBytes.SequenceEqual(new byte[] { 0x05, 0x00 }))
-            {
-                for (int i = 0; i < length; i++)
-                {
+            else if (identificationBytes.SequenceEqual(new byte[] { 0x05, 0x00 })) {
+                for (int i = 0; i < length; i++) {
                     AppendListStringBuilder(builder, GetDoubleFP());
                 }
             }
-            else if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 }))
-            {
-                for (int i = 0; i < length; i++)
-                {
+            else if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 })) {
+                for (int i = 0; i < length; i++) {
                     AppendListStringBuilder(builder, data.Dequeue());
                 }
             }
-            else if (identificationBytes.SequenceEqual(new byte[] { 0x16, 0x00 }))
-            {
-                for (int i = 0; i < length; i++)
-                {
+            else if (identificationBytes.SequenceEqual(new byte[] { 0x16, 0x00 })) {
+                for (int i = 0; i < length; i++) {
                     AppendListStringBuilder(builder, GetInt32());
                 }
-            } else if (identificationBytes.SequenceEqual(new byte[] { 0x00, 0x00 })) {
+            }
+            else if (identificationBytes.SequenceEqual(new byte[] { 0x00, 0x00 })) {
                 return "[]";
             }
-            else
-            {
+            else {
                 throw new NotImplementedException();
             }
 
