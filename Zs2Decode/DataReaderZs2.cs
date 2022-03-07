@@ -24,10 +24,9 @@ namespace Zs2Decode {
 
         public void ReadData() {
             var bytes = GetStream().ToArray();
-            var output = new List<Chunk>();
             ChunkFactory fac = new ChunkFactory(bytes.Skip(4).ToArray());
-            var chunks = fac.GenerateChunks();
-            chunks.ForEach(chunk => Console.WriteLine(chunk.Name));
+            var output = fac.GenerateChunks();
+            output.ForEach(chunk => Console.WriteLine(chunk.Name));
         }
     }
 }
