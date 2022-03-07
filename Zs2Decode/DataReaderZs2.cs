@@ -1,32 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.IO.Compression;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using Microsoft.VisualBasic.CompilerServices;
+﻿using System.IO.Compression;
 
-namespace Zs2Decode {
-    public class DataReaderZs2 {
-        private readonly string FileName;
+namespace Zs2Decode; 
 
-        public DataReaderZs2(string fileName) {
-            FileName = fileName;
-        }
+public class DataReaderZs2 {
+    private readonly string FileName;
 
-        private MemoryStream GetStream() {
-            using FileStream stream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
-            using var gzip = new GZipStream(stream, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-            return output;
-        }
+    public DataReaderZs2(string fileName) {
+        FileName = fileName;
+    }
 
-        public void ReadData() {
-            var bytes = GetStream().ToArray();
-            ChunkFactory fac = new ChunkFactory(bytes.Skip(4).ToArray());
-            var output = fac.GenerateChunks();
-            output.ForEach(chunk => Console.WriteLine(chunk.Name));
-        }
+    private MemoryStream GetStream() {
+        using var stream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
+        using var gzip = new GZipStream(stream, CompressionMode.Decompress);
+        using var output = new MemoryStream();
+        gzip.CopyTo(output);
+        return output;
+    }
+
+    public void ReadData() {
+        var bytes = GetStream().ToArray();
+        var fac = new ChunkFactory(bytes.Skip(4).ToArray());
+        var output = fac.GenerateChunks();
+        output.ForEach(chunk => Console.WriteLine(chunk.Name));
     }
 }
