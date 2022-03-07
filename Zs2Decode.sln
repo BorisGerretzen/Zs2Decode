@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zs2Decode", "Zs2Decode\Zs2Decode.csproj", "{07C4FD04-1A31-4FCE-B21E-A68117A92E59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{15918117-676F-4F8C-80ED-BEAD2A446E5C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07C4FD04-1A31-4FCE-B21E-A68117A92E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07C4FD04-1A31-4FCE-B21E-A68117A92E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07C4FD04-1A31-4FCE-B21E-A68117A92E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07C4FD04-1A31-4FCE-B21E-A68117A92E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15918117-676F-4F8C-80ED-BEAD2A446E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15918117-676F-4F8C-80ED-BEAD2A446E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15918117-676F-4F8C-80ED-BEAD2A446E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15918117-676F-4F8C-80ED-BEAD2A446E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA59BA84-574C-402B-B27C-B907F6A4485F}
+	EndGlobalSection
+EndGlobal
