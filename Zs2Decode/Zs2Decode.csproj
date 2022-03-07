@@ -5,6 +5,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>10</LangVersion>
+    <Authors>BortGerres</Authors>
+    <Description>Decoder for ZwickRoell zs2 files.</Description>
+    <PackageProjectUrl>https://github.com/BorisGerretzen/Zs2Decode</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BorisGerretzen/Zs2Decode</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>zs2;Zwick;ZwickRoell;</PackageTags>
+    <PackageLicenseFile>..\LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
