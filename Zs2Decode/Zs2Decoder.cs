@@ -2,10 +2,10 @@
 
 namespace Zs2Decode;
 
-public class DataReaderZs2 {
+public class Zs2Decoder {
     private readonly string FileName;
 
-    public DataReaderZs2(string fileName) {
+    public Zs2Decoder(string fileName) {
         FileName = fileName;
     }
 

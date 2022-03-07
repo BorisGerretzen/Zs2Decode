@@ -20,6 +20,6 @@ var rootChunk = reader.ReadData();
 // Write data to xml
 var writer = new XmlSerializer(typeof(Chunk));
 var file = File.OpenWrite(outputFile);
-writer.serialize(file, rootChunk);
+writer.Serialize(file, rootChunk);
 file.Close();
 ```

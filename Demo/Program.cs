@@ -1,12 +1,16 @@
 ﻿using System.Xml.Serialization;
 using Zs2Decode;
 
-var reader = new DataReaderZs2("./test.zs2");
-var chunk = reader.ReadData();
-var writer =
-    new XmlSerializer(typeof(Chunk));
+// Files
+var inputFile = "./input.zs2";
+var outputFile = "./output.xml";
 
-var path = "./test_self.xml";
-var file = File.OpenWrite(path);
-writer.Serialize(file, chunk);
+// Get data
+var reader = new Zs2Decoder(inputFile);
+var rootChunk = reader.ReadData();
+
+// Write data to xml
+var writer = new XmlSerializer(typeof(Chunk));
+var file = File.OpenWrite(outputFile);
+writer.Serialize(file, rootChunk);
 file.Close();
