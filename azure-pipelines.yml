@@ -20,7 +20,15 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
+
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'build'
-    projects: './Zs2Decode/Zs2Decode.csproj'
+    command: 'pack'
+    packagesToPack: './Zs2Decode/Zs2Decode.csproj'
+    versioningScheme: 'byBuildNumber'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
