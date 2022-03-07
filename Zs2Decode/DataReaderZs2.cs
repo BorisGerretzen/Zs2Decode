@@ -14,14 +14,11 @@ namespace Zs2Decode {
         }
 
         private MemoryStream GetStream() {
-            using (FileStream stream = new FileStream(FileName, FileMode.Open, FileAccess.Read)) {
-                using (var gzip = new GZipStream(stream, CompressionMode.Decompress)) {
-                    using (var output = new MemoryStream()) {
-                        gzip.CopyTo(output);
-                        return output;
-                    }
-                }
-            }
+            using FileStream stream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
+            using var gzip = new GZipStream(stream, CompressionMode.Decompress);
+            using var output = new MemoryStream();
+            gzip.CopyTo(output);
+            return output;
         }
 
         public void ReadData() {
