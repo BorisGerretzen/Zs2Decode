@@ -1,7 +1,11 @@
 # Zs2Decode
 This is an implementation of a decoder for ZwickRoell .zs2 files built in C#. Not everything is working yet, I skipped all of the ZIMT stuff because it was too much work to implement and I don't really need it.
-Currently it is only possible to convert the entire file to xml, I am working on a way to just export the measurements.\
+Currently it is only possible to convert the entire file to xml, I am working on a way to just export the measurements.
+
 I would not have been able to make this without [Chris Petrich](https://github.com/cpetrich)'s [great documentation](https://zs2decode.readthedocs.io/en/latest/), thanks Chris!
+
+## How to install
+To install using Nuget, run ```Install-Package Zs2Decode``` in the package manager console. The Nuget page can be found [here](https://www.nuget.org/packages/Zs2Decode/).
 
 ## How to use
 ### Export to xml
