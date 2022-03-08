@@ -9,6 +9,10 @@ public class Zs2Decoder {
         FileName = fileName;
     }
 
+    /// <summary>
+    ///     Decompresses the zs2 and creates a MemoryStream of it.
+    /// </summary>
+    /// <returns>MemoryStream of the target file.</returns>
     private MemoryStream GetStream() {
         using var stream = new FileStream(FileName, FileMode.Open, FileAccess.Read);
         using var gzip = new GZipStream(stream, CompressionMode.Decompress);
@@ -17,6 +21,10 @@ public class Zs2Decoder {
         return output;
     }
 
+    /// <summary>
+    ///     Reads the data from the given filename and returns the root chunk of the file.
+    /// </summary>
+    /// <returns>The root chunk of the file.</returns>
     public Chunk ReadData() {
         var bytes = GetStream().ToArray();
         var fac = new ChunkFactory(bytes.Skip(4).ToArray());

@@ -20,14 +20,14 @@ public class Chunk {
     }
 
     /// <summary>
-    /// Constructor for xml serializer
+    ///     Constructor for xml serializer
     /// </summary>
     internal Chunk() {
         Children = new List<Chunk>();
     }
 
     /// <summary>
-    /// Adds a child to the current chunk, also sets the child's parent to this node.
+    ///     Adds a child to the current chunk, also sets the child's parent to this node.
     /// </summary>
     /// <param name="child">The new child</param>
     public void AddChild(Chunk child) {

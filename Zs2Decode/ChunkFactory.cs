@@ -93,7 +93,7 @@ internal class ChunkFactory {
         // If identification bytes are 0x1100, it is a special list
         // https://zs2decode.readthedocs.io/en/latest/special_chunks.html
         // Currently not working, outputs hex data 
-        if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 })) 
+        if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 }))
             builder.Append(BitConverter.ToString(data.DequeueChunk(length).ToArray()));
         // 0x04 => single precision floating point
         else if (identificationBytes.SequenceEqual(new byte[] { 0x04, 0x00 }))
