@@ -1,6 +1,6 @@
 ﻿using Zs2Decode;
 
-namespace Demo; 
+namespace Demo;
 
 public static class GetSensorData {
     public static void Main() {
@@ -12,7 +12,26 @@ public static class GetSensorData {
         var reader = new Zs2Decoder(inputFile);
         var rootChunk = reader.ReadData();
 
-        // TODO finish demo
+        // Get sensors
+        var sensors = rootChunk.Sensors;
+
+        // Loop through each sensor
+        foreach (var sensor in sensors) {
+            Console.WriteLine(sensor.Name);
+
+            // Loop from 0 to the max row of all runs
+            for (int row = 0; row < sensor.Values.Max(runVals => runVals.Count); row++) {
+                // Loop through each run
+                for (int run = 0; run < sensor.Values.Count; run++) {
+                    // Print value if it exists in this row
+                    if (row < sensor.Values[run].Count) {
+                        // Doesnt properly format but Ill fix this later
+                        Console.Write($"{sensor.Values[run][row]}\t\t");
+                    }
+                }
+                Console.Write("\n");
+            }
+        }
 
         Console.WriteLine("Done");
     }

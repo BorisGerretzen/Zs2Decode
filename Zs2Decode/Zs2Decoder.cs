@@ -27,7 +27,7 @@ public class Zs2Decoder {
     /// </summary>
     /// <exception cref="FormatException">If incorrect header bytes found</exception>
     /// <returns>The root chunk of the file.</returns>
-    public Chunk ReadData() {
+    public RootChunk ReadData() {
         var bytes = GetStream().ToArray();
         var firstFour = bytes.Take(4).ToArray();
         if (!firstFour.SequenceEqual(new byte[] {

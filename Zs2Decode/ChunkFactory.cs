@@ -13,7 +13,7 @@ internal class ChunkFactory {
     ///     Generates the chunk structure from the stored data.
     /// </summary>
     /// <returns>The root node of the structure.</returns>
-    public Chunk GenerateChunks() {
+    public RootChunk GenerateChunks() {
         // Get root chunk
         var rootChunk = (RootChunk)GetNextChunk(true);
         var currentChunk = (Chunk)rootChunk;
