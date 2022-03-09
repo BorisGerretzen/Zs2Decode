@@ -5,7 +5,7 @@ namespace Zs2Decode;
 internal class DataHolder : LinkedList<byte> {
     private List<byte> _checkpoint;
     private bool _checkpointSet;
-    public int CurrentPosition;
+    public int CurrentPosition=4;
 
     public DataHolder(IEnumerable<byte> collection) : base(collection) { }
     public int CheckpointCount => _checkpoint.Count;
@@ -23,6 +23,7 @@ internal class DataHolder : LinkedList<byte> {
     /// </summary>
     public void RestoreCheckPoint() {
         _checkpointSet = false;
+        CurrentPosition -= _checkpoint.Count;
         for (var i = _checkpoint.Count - 1; i >= 0; i--) AddFirst(_checkpoint[i]);
     }
 

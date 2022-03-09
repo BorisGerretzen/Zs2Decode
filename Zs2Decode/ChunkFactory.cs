@@ -22,7 +22,7 @@ internal class ChunkFactory {
             // 0xFF is a closing tag, set current node to parent.
             while (data.First != null && data.First.Value == 0xFF) {
                 currentChunk = currentChunk.Parent;
-                data.RemoveFirst();
+                data.Dequeue();
             }
 
             // Only create new chunk if there is data
@@ -166,6 +166,7 @@ internal class ChunkFactory {
     /// <returns>The next chunk</returns>
     private Chunk GetNextChunk(bool root = false) {
         // Get name and type
+        var startIndex = data.CurrentPosition;
         int nameLength = data.Dequeue();
         var name = data.GetString(nameLength);
         int type = data.Dequeue();
@@ -226,6 +227,6 @@ internal class ChunkFactory {
 
         if (root) return new RootChunk(name, type, val);
 
-        return new Chunk(name, type, val, data.CurrentPosition);
+        return new Chunk(name, type, val, startIndex);
     }
 }
