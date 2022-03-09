@@ -1,5 +1,4 @@
-﻿using System.Net.Mime;
-using Demo;
+﻿using Demo;
 
 Menu();
 
@@ -10,17 +9,14 @@ void Menu() {
         Console.WriteLine("[1] - XML decode ");
         Console.WriteLine("[2] - Get sensor data ");
         Console.WriteLine("[3] - Quit");
-        string choice = Console.ReadLine();
+        var choice = Console.ReadLine();
 
-        if (choice == "1") {
+        if (choice == "1")
             XmlDecode.Main();
-        }
-        else if (choice == "2") {
+        else if (choice == "2")
             GetSensorData.Main();
-        }
-        else if (choice == "3") {
-            Environment.Exit(0);
-        }
+        else if (choice == "3") Environment.Exit(0);
+        Console.WriteLine("Press enter to continue");
         Console.ReadLine();
     }
 }

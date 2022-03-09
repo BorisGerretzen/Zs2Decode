@@ -5,22 +5,60 @@ namespace Zs2Decode;
 internal class DataHolder : LinkedList<byte> {
     private List<byte> _checkpoint;
     private bool _checkpointSet;
-    public int CheckpointCount => _checkpoint.Count;
-    public int CurrentPosition = 0;
+    public int CurrentPosition;
 
     public DataHolder(IEnumerable<byte> collection) : base(collection) { }
+    public int CheckpointCount => _checkpoint.Count;
 
+    /// <summary>
+    /// Creates a new checkpoint, all values dequeued after calling this function will be saved in a private list.
+    /// </summary>
     public void CreateCheckpoint() {
         _checkpointSet = true;
         _checkpoint = new List<byte>();
     }
 
+    /// <summary>
+    /// Restores all the saved values from the private list to the normal list.
+    /// </summary>
     public void RestoreCheckPoint() {
         _checkpointSet = false;
-        for (int i = _checkpoint.Count - 1; i >= 0; i--) {
-            AddFirst(_checkpoint[i]);
-        }
+        for (var i = _checkpoint.Count - 1; i >= 0; i--) AddFirst(_checkpoint[i]);
     }
+
+    /// <summary>
+    /// Returns the first n bytes from the list and removes them.
+    /// </summary>
+    /// <param name="chunkSize">Number of bytes to get and remove</param>
+    /// <returns>First n bytes</returns>
+    /// <exception cref="IndexOutOfRangeException">If first == null</exception>
+    public IEnumerable<byte> DequeueChunk(int chunkSize) {
+        for (var i = 0; i < chunkSize && Count > 0; i++)
+            if (First != null)
+                yield return Dequeue();
+            else
+                throw new IndexOutOfRangeException();
+    }
+
+    /// <summary>
+    /// Returns the first byte of the list and removes it.
+    /// </summary>
+    /// <returns>First byte of the list</returns>
+    /// <exception cref="IndexOutOfRangeException">If first == null</exception>
+    public byte Dequeue() {
+        if (First != null) {
+            var val = First.Value;
+            if (_checkpointSet) _checkpoint.Add(val);
+
+            CurrentPosition++;
+            RemoveFirst();
+            return val;
+        }
+
+        throw new IndexOutOfRangeException();
+    }
+
+    #region Data collection from stream
 
     public uint GetUInt32() {
         return BitConverter.ToUInt32(DequeueChunk(4).ToArray());
@@ -60,28 +98,5 @@ internal class DataHolder : LinkedList<byte> {
         return Encoding.ASCII.GetString(bytes);
     }
 
-    public IEnumerable<byte> DequeueChunk(int chunkSize) {
-        for (var i = 0; i < chunkSize && Count > 0; i++)
-            if (First != null) {
-                yield return Dequeue();
-            }
-            else {
-                throw new IndexOutOfRangeException();
-            }
-    }
-
-    public byte Dequeue() {
-        if (First != null) {
-            var val = First.Value;
-            if (_checkpointSet) {
-                _checkpoint.Add(val);
-            }
-
-            CurrentPosition++;
-            RemoveFirst();
-            return val;
-        }
-
-        throw new IndexOutOfRangeException();
-    }
+    #endregion
 }
