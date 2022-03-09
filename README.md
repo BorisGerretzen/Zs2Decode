@@ -1,6 +1,6 @@
-
-
 # Zs2Decode
+[![Build Status](https://dev.azure.com/bortgerres/zs2decode/_apis/build/status/BorisGerretzen.Zs2Decode?branchName=master)](https://dev.azure.com/bortgerres/zs2decode/_build/latest?definitionId=3&branchName=master)
+
 This is an implementation of a decoder for ZwickRoell .zs2 files built in C#. Currently the project supports converting .zs2 files to .xml, and getting the sensor data from a .zs2 file. As for decoding the .zs2 file, not all elements are correctly decoded, all elements starting with QS_, except QS_TextPar and QS_ValPar,  currently have the bytes from the binary as value.
 
 I would not have been able to make this without [Chris Petrich](https://github.com/cpetrich)'s [great documentation](https://zs2decode.readthedocs.io/en/latest/), thanks Chris!
