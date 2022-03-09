@@ -1,12 +1,13 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Text;
 
 namespace Zs2Decode;
 
 internal class ChunkFactory {
-    private readonly Queue<byte> data;
+    private DataHolder data;
 
     public ChunkFactory(byte[] bytes) {
-        data = new Queue<byte>(bytes);
+        data = new DataHolder(bytes);
     }
 
     /// <summary>
@@ -15,24 +16,26 @@ internal class ChunkFactory {
     /// <returns>The root node of the structure.</returns>
     public Chunk GenerateChunks() {
         // Get root chunk
-        var rootChunk = GetNextChunk();
-        var currentChunk = rootChunk;
+        RootChunk rootChunk = (RootChunk)GetNextChunk(true);
+        var currentChunk = (Chunk)rootChunk;
+        List<Chunk> chunks = new List<Chunk>();
         while (data.Count > 0) {
             // 0xFF is a closing tag, set current node to parent.
-            byte peeked;
-            while (data.TryPeek(out peeked) && peeked == 0xFF) {
+            while (data.First != null && data.First.Value == 0xFF) {
                 currentChunk = currentChunk.Parent;
-                data.Dequeue();
+                data.RemoveFirst();
             }
 
             // Only create new chunk if there is data
-            if (data.TryPeek(out peeked)) {
+            if (data.First != null) {
                 var newChunk = GetNextChunk();
+                chunks.Add(newChunk);
                 currentChunk.AddChild(newChunk);
                 if (newChunk.Type == 0xDD) currentChunk = newChunk;
             }
         }
 
+        rootChunk.PopulateSensors();
         return rootChunk;
     }
 
@@ -61,7 +64,7 @@ internal class ChunkFactory {
             stringLength -= 2147483648;
 
             // Get bytes and return string
-            return GetString((int)stringLength, true);
+            return data.GetString((int)stringLength, true);
         }
 
         // I dont know if an AA type happens without bit 31 being set, here just in case.
@@ -78,31 +81,64 @@ internal class ChunkFactory {
         builder.Append(", ");
     }
 
+    private void CountStrings(LinkedList<byte> bytes) { }
+
     /// <summary>
     ///     Gets the string value of an EE chunk
     /// </summary>
     /// <returns>String representation of the value</returns>
     /// <exception cref="NotImplementedException">If list type is not implemented yet</exception>
-    private string GetValueEE() {
+    private string GetValueEE(string name) {
         var identificationBytes = data.DequeueChunk(2).ToArray();
-        var length = GetInt32();
-
+        var length = data.GetInt32();
         var builder = new StringBuilder();
         builder.Append("[");
 
         // If identification bytes are 0x1100, it is a special list
         // https://zs2decode.readthedocs.io/en/latest/special_chunks.html
         // Currently not working, outputs hex data 
-        if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 }))
-            builder.Append(BitConverter.ToString(data.DequeueChunk(length).ToArray()));
+        if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 })) {
+            if (name == "QS_TextPar") {
+                AppendListStringBuilder(builder, data.Dequeue());
+                AppendListStringBuilder(builder, GetValueAA());
+                AppendListStringBuilder(builder, GetValueAA());
+                AppendListStringBuilder(builder, GetValueAA());
+                AppendListStringBuilder(builder, GetValueAA());
+            }
+            else if (name == "QS_ValPar") {
+                data.CreateCheckpoint();
+                AppendListStringBuilder(builder, data.Dequeue());
+                AppendListStringBuilder(builder, data.GetDoubleFP());
+                AppendListStringBuilder(builder, GetValueAA());
+                AppendListStringBuilder(builder, data.GetInt16());
+                for (int i = 0; i < 9; i++) {
+                    AppendListStringBuilder(builder, data.Dequeue());
+                }
+
+                if (data.CheckpointCount != length) {
+                    data.RestoreCheckPoint();
+                    for (int i = 0; i < 9; i++) {
+                        AppendListStringBuilder(builder, data.Dequeue());
+                    }
+
+                    AppendListStringBuilder(builder, GetValueAA());
+                    for (int i = 0; i < 38; i++) {
+                        AppendListStringBuilder(builder, data.Dequeue());
+                    }
+                }
+            }
+            else {
+                builder.Append(BitConverter.ToString(data.DequeueChunk(length).ToArray()));
+            }
+        }
         // 0x04 => single precision floating point
         else if (identificationBytes.SequenceEqual(new byte[] { 0x04, 0x00 }))
             for (var i = 0; i < length; i++)
-                AppendListStringBuilder(builder, GetSingleFP());
+                AppendListStringBuilder(builder, data.GetSingleFP());
         // 0x05 => double precision floating point
         else if (identificationBytes.SequenceEqual(new byte[] { 0x05, 0x00 }))
             for (var i = 0; i < length; i++)
-                AppendListStringBuilder(builder, GetDoubleFP());
+                AppendListStringBuilder(builder, data.GetDoubleFP());
         // 0x11 => bytes
         else if (identificationBytes.SequenceEqual(new byte[] { 0x11, 0x00 }))
             for (var i = 0; i < length; i++)
@@ -110,7 +146,7 @@ internal class ChunkFactory {
         // 0x16 => 32 bit integers.
         else if (identificationBytes.SequenceEqual(new byte[] { 0x16, 0x00 }))
             for (var i = 0; i < length; i++)
-                AppendListStringBuilder(builder, GetInt32());
+                AppendListStringBuilder(builder, data.GetInt32());
         // 0x00 => empty
         else if (identificationBytes.SequenceEqual(new byte[] { 0x00, 0x00 }))
             return "[]";
@@ -127,10 +163,10 @@ internal class ChunkFactory {
     ///     Starts reading from the Queue and returns the next chunk as an object.
     /// </summary>
     /// <returns>The next chunk</returns>
-    private Chunk GetNextChunk() {
+    private Chunk GetNextChunk(bool root = false) {
         // Get name and type
         int nameLength = data.Dequeue();
-        var name = GetString(nameLength);
+        var name = data.GetString(nameLength);
         int type = data.Dequeue();
 
         // Get value depending on type
@@ -139,22 +175,25 @@ internal class ChunkFactory {
             // contains other elements
             case 0xDD:
                 int valueLength = data.Dequeue();
-                val = GetString(valueLength);
+                val = data.GetString(valueLength);
+                break;
+            // 2 byte uint 
+            case 0x66:
+                val = data.GetUInt16().ToString();
                 break;
             // 2 byte int
-            case 0x66:
             case 0x55:
-                val = GetInt16().ToString();
+                val = data.GetInt16().ToString();
                 break;
             // 4 byte int
             case 0x11:
             case 0x33:
-                val = GetInt32().ToString();
+                val = data.GetInt32().ToString();
                 break;
             // 4 byte uint
             case 0x44:
             case 0x22:
-                val = GetUInt32().ToString();
+                val = data.GetUInt32().ToString();
                 break;
             // string
             case 0xAA:
@@ -162,11 +201,11 @@ internal class ChunkFactory {
                 break;
             // Single precision floating point
             case 0xBB:
-                val = GetSingleFP().ToString();
+                val = data.GetSingleFP().ToString();
                 break;
             // Double precision floating point
             case 0xCC:
-                val = GetDoubleFP().ToString();
+                val = data.GetDoubleFP().ToString();
                 break;
             // Byte
             case 0x88:
@@ -174,55 +213,20 @@ internal class ChunkFactory {
                 break;
             // Boolean
             case 0x99:
-                val = GetBool().ToString();
+                val = data.GetBool().ToString();
                 break;
             // Lists
             case 0xEE:
-                val = GetValueEE();
+                val = GetValueEE(name);
                 break;
             default:
                 throw new NotImplementedException();
-                break;
         }
 
-        return new Chunk(name, type, val);
+        if (root) {
+            return new RootChunk(name, type, val);
+        }
+
+        return new Chunk(name, type, val, data.CurrentPosition);
     }
-
-    #region Stream readers
-
-    private uint GetUInt32() {
-        return BitConverter.ToUInt32(data.DequeueChunk(4).ToArray());
-    }
-
-    private short GetInt16() {
-        return BitConverter.ToInt16(data.DequeueChunk(2).ToArray());
-    }
-
-    private int GetInt32() {
-        return BitConverter.ToInt32(data.DequeueChunk(4).ToArray());
-    }
-
-    private float GetSingleFP() {
-        return BitConverter.ToSingle(data.DequeueChunk(4).ToArray());
-    }
-
-    private double GetDoubleFP() {
-        return BitConverter.ToDouble(data.DequeueChunk(8).ToArray());
-    }
-
-    private bool GetBool() {
-        return data.Dequeue() == 0x01;
-    }
-
-    private long GetInt64() {
-        return BitConverter.ToInt64(data.DequeueChunk(8).ToArray());
-    }
-
-    private string GetString(int len, bool remove0x00 = false) {
-        var mult = remove0x00 ? 2 : 1;
-        var bytes = data.DequeueChunk(len * mult).Where(b => b != 0x00).ToArray();
-        return Encoding.ASCII.GetString(bytes);
-    }
-
-    #endregion
 }
