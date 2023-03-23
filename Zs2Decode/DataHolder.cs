@@ -93,10 +93,13 @@ internal class DataHolder : LinkedList<byte> {
         return BitConverter.ToInt64(DequeueChunk(8).ToArray());
     }
 
-    public string GetString(int len, bool remove0x00 = false) {
-        var mult = remove0x00 ? 2 : 1;
-        var bytes = DequeueChunk(len * mult).Where(b => b != 0x00).ToArray();
-        return Encoding.ASCII.GetString(bytes);
+    public string GetString(int len, bool isUnicode = false) {
+        var bytesPerChar = isUnicode ? 2 : 1;
+
+        var bytes = DequeueChunk(len * bytesPerChar);
+        return isUnicode ? 
+            Encoding.Unicode.GetString(bytes.ToArray()) : 
+            Encoding.ASCII.GetString(bytes.Where(b => b != 0x00).ToArray());
     }
 
     #endregion
